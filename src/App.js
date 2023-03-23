@@ -13,7 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {Outlet} from "react-router-dom";
 import DrawerItem from "./SideBarItem";
-import {Home, Public, WbSunny} from "@mui/icons-material";
+import {Home, WbSunny} from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -85,11 +85,10 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 const pages = [
     {name: "Home", route: "/home", icon:<Home/>},
-    {name: "Cities", route: "/cities", icon:<Public/>},
+    // {name: "Cities", route: "/cities", icon:<Public/>},
     {name: "Reports", route: "/reports",icon:<WbSunny/>}
 ]
 export default function App() {
-    const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
     const handleDrawerOpen = () => {
@@ -130,7 +129,7 @@ export default function App() {
                 </DrawerHeader>
                 <Divider/>
                 <List>
-                    {pages.map((page, index) => (
+                    {pages.map((page) => (
                         <DrawerItem
                         name={page.name}
                         icon={page.icon}
