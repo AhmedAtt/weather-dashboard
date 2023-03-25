@@ -6,12 +6,13 @@ import FiltersGroup from "./FiltersGroup";
 import {Button, Checkbox, FormControlLabel, FormGroup} from "@mui/material";
 import {format} from "date-fns";
 import {CityFilter} from "../../types/City";
+import {LoadedReport} from "../../types/Report";
 
 type FilterProps = {
     onSubmitFilters: (filters: Record<number, CityFilter>, temperature: boolean, humidity: boolean) => void,
-    initialFilter: CityFilter | null
+    loadedReport: LoadedReport | null,
 }
-export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
+export const Filters = ({onSubmitFilters, loadedReport}: FilterProps) => {
 
     const [filters, setFilters] = useState<Record<number, CityFilter>>({});
     const [temperature, setTemperature] = useState(true);
@@ -23,15 +24,42 @@ export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
     }, [filters, temperature, humidity]);
 
     useEffect(() => {
-        setFilters([initialFilter ? initialFilter : {
-            id: 0,
-            name: '',
-            latitude: 0,
-            longitude: 0,
-            startDate: null,
-            endDate: null
-        }]);
-    }, [initialFilter]);
+        if (loadedReport) {
+            const {
+                name,
+                latitude,
+                longitude,
+                startDate,
+                endDate
+            } = loadedReport
+            setFilters({
+                0: {
+                    id: 0,
+                    name,
+                    latitude,
+                    longitude,
+                    startDate,
+                    endDate,
+                }
+            });
+            setTemperature(loadedReport.temperature);
+            setHumidity(loadedReport.humidity);
+        } else {
+            setFilters({
+                0: {
+                    id: 0,
+                    name: '',
+                    latitude: 0,
+                    longitude: 0,
+                    startDate: null,
+                    endDate: null
+                }
+            });
+            setTemperature(true);
+            setHumidity(false);
+        }
+
+    }, [loadedReport]);
 
     const handleAddCity = () => {
         const filtersCount = Object.keys(filters).length;
@@ -96,7 +124,7 @@ export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
                 cityId={parseInt(id)}
                 onGroupFilterChanged={handleGroupFilterChanged}
                 onRemoveCity={handleRemoveCity}
-                initialFilter={index === 0 ? initialFilter : null}
+                loadedReport={index === 0 ? loadedReport : null}
             />)
         }
         <div className="add-group">

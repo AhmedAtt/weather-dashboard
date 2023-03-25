@@ -7,11 +7,12 @@ import {useParams} from "react-router-dom";
 import NotificationContext from "../../contexts/NotificationContext";
 import {CityFilter} from "../../types/City";
 import {getWeatherForCityResponse} from "../../data-calls/types";
+import {LoadedReport} from "../../types/Report";
 
 export default function Home() {
     const notificationContext = useContext(NotificationContext);
     const [chartsData, setChartsData] = useState<getWeatherForCityResponse[]>([]);
-    const [initialFilter, setInitialFilter] = useState<CityFilter | null>(null);
+    const [loadedReport, setLoadedReport] = useState<LoadedReport|null>(null);
 
     const {reportId} = useParams();
     useEffect(() => {
@@ -21,15 +22,7 @@ export default function Home() {
                 notificationContext.error('Report not found');
                 return;
             }
-            const {latitude, longitude, startDate, endDate, name} = JSON.parse(report);
-            setInitialFilter({
-                id: 0,
-                name: name || '',
-                latitude,
-                longitude,
-                startDate,
-                endDate,
-            })
+            setLoadedReport(JSON.parse(report));
         }
     }, [reportId]);
 
@@ -53,7 +46,7 @@ export default function Home() {
     return (
         <div className="home">
             <div className="filters">
-                <Filters initialFilter={initialFilter} onSubmitFilters={handleSubmit}/>
+                <Filters loadedReport={loadedReport} onSubmitFilters={handleSubmit}/>
             </div>
             <div className="charts">
                 {chartsData.map((dataItem, index) => <div className="chart-wrapper" key={`chart-wrapper-${index}`}>

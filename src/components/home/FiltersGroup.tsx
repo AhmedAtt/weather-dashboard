@@ -7,16 +7,24 @@ import {useContext, useEffect, useState} from "react";
 import {format} from "date-fns";
 import {City, CityFilter} from "../../types/City";
 import NotificationContext from "../../contexts/NotificationContext";
+import {LoadedReport} from "../../types/Report";
 
 type FiltersGroupProps = {
     cityId: number,
     onGroupFilterChanged: (id: number, filter: CityFilter) => void,
     onRemoveCity: (id: number) => void,
-    initialFilter: CityFilter | null
+    loadedReport: LoadedReport | null
 }
-export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity, initialFilter}: FiltersGroupProps) {
+export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity, loadedReport}: FiltersGroupProps) {
     const notificationContext = useContext(NotificationContext);
-    const [filter, setFilter] = useState<CityFilter>(initialFilter ? initialFilter : {
+    const [filter, setFilter] = useState<CityFilter>(loadedReport ? {
+        id: cityId,
+        name: loadedReport.name,
+        latitude: loadedReport.latitude,
+        longitude: loadedReport.longitude,
+        startDate: loadedReport.startDate,
+        endDate: loadedReport.endDate
+    } : {
         id: cityId,
         name: '',
         latitude: 0,
@@ -68,13 +76,7 @@ export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity
 
     const handleSelectCity = (city: City) => {
         if (city) {
-            setFilter({...filter, latitude: city.latitude, longitude: city.longitude});
-            onGroupFilterChanged(cityId, {
-                ...filter,
-                name: city.name,
-                latitude: city.latitude,
-                longitude: city.longitude
-            });
+            setFilter({...filter, latitude: city.latitude, longitude: city.longitude, name: city.name});
         }
     }
 
@@ -91,7 +93,7 @@ export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity
                    value={filter.longitude}
                    onChange={(e) => onFilterChanged('longitude', e.target.value)}
                    type="number"/>
-        <FiltersCityPicker onSelectCity={handleSelectCity}/>
+        <FiltersCityPicker onSelectCity={handleSelectCity} />
         <FiltersDatePicker
             onDateChanged={(date) => onFilterChanged('startDate', date)}
             dateValue={filter.startDate}/>

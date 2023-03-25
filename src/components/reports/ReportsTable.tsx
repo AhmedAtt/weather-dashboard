@@ -124,7 +124,6 @@ export default function ReportsTable({setSelectedReports}: ReportsTableProps) {
 
     // delete single report
     const handleDeleteSingle = (key:string) => {
-        console.log(key);
         localStorage.removeItem(key);
         setSelectedCombined([]);
     }
