@@ -114,7 +114,7 @@ export default function ReportsTable({setSelectedReports}: ReportsTableProps) {
             }
         });
         setRows(rows);
-    }, [localStorage]);
+    }, [Object.keys(localStorage).length]);
 
     const setSelectedCombined = (items:string[]) => {
         setSelectedReports(items);
@@ -137,7 +137,7 @@ export default function ReportsTable({setSelectedReports}: ReportsTableProps) {
 
     const handleSelectAllClick = (event:  React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.name);
+            const newSelected = rows.map((n) => n.id);
             setSelectedCombined(newSelected);
             return;
         }
@@ -172,12 +172,13 @@ export default function ReportsTable({setSelectedReports}: ReportsTableProps) {
                     sx={{minWidth: 750}}
                     aria-labelledby="tableTitle"
                 >
-                    <TableHeader numSelected={selected.length} onSelectAllClick={handleSelectAllClick}
+                    <TableHeader numSelected={selected.length}
+                                 onSelectAllClick={handleSelectAllClick}
                                  rowCount={rows.length}/>
 
                     <TableBody>
                         {rows.map((row, index) => {
-                            const isItemSelected = isSelected(row.name);
+                            const isItemSelected = isSelected(row.id);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
