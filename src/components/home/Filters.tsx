@@ -63,19 +63,22 @@ export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
     }
 
     const handleSaveReport = () => {
-        const reports = Object.keys(filters).map((key) => {
-            const {latitude, longitude, startDate, endDate, name}: CityFilter = filters[parseInt(key)];
-            return {
-                name,
-                latitude,
-                longitude,
-                startDate: startDate,
-                endDate: endDate,
-                temperature,
-                humidity,
-                createdAt: format(new Date(), 'yyyy-MM-dd'),
+        const reports = [];
+        for(let i = 0; i < Object.keys(filters).length; i++) {
+            const {latitude, longitude, startDate, endDate, name} = filters[i];
+            if(latitude && longitude){
+                reports.push({
+                    name,
+                    latitude,
+                    longitude,
+                    startDate: startDate,
+                    endDate: endDate,
+                    temperature,
+                    humidity,
+                    createdAt: format(new Date(), 'yyyy-MM-dd'),
+                })
             }
-        });
+        }
         //get max report number
         const reportKeys = Object.keys(localStorage).filter(key => key.startsWith("Report-"));
         const numbers = reportKeys.map(key => parseInt(key.split("-")[1]));
