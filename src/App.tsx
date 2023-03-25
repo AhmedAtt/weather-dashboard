@@ -16,6 +16,7 @@ import {Home, WbSunny} from "@mui/icons-material";
 import {CSSObject} from "@mui/material";
 import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import NotificationAlert from "./components/commons/NotificationAlert";
+import {NotificationProvider} from "./contexts/NotificationContext";
 
 const drawerWidth = 240;
 
@@ -149,9 +150,11 @@ export default function App() {
 
             </Drawer>
             <Box component="main" sx={{flexGrow: 1, p: 3}}>
-                <NotificationAlert/>
                 <DrawerHeader/>
-                <Outlet/>
+                <NotificationProvider>
+                    <NotificationAlert/>
+                    <Outlet/>
+                </NotificationProvider>
             </Box>
         </Box>
     );

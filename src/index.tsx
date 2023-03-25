@@ -7,7 +7,6 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import PageNotFound from "./PageNotFound";
 import Reports from "./components/reports/Reports";
 import Home from "./components/home/Home";
-import {NotificationProvider} from "./contexts/NotificationContext";
 
 
 const router = createBrowserRouter([
@@ -24,9 +23,8 @@ const router = createBrowserRouter([
 ])
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(<NotificationProvider>
+root.render(
         <RouterProvider router={router}/>
-    </NotificationProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
