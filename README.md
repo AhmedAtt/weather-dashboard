@@ -9,7 +9,7 @@ A dashboard to display the weather for a given location. The dashboard is built 
 
 ### Home
 
-![Home](/home/attia/WebstormProjects/weather-dashboard/src/assets/screenshots/all-reports.png "Optional Title")
+![Home](src/assets/screenshots/all-reports.png "Optional Title")
 
 One the home page, the user can:
 - Search for a city
@@ -23,7 +23,7 @@ One the home page, the user can:
 
 ### Reports
 
-![Report](/home/attia/WebstormProjects/weather-dashboard/src/assets/screenshots/reports-table.png "Optional Title")
+![Report](src/assets/screenshots/reports-table.png "Optional Title")
 
 On the reports page, the user can:
 - View all saved reports
