@@ -62,7 +62,7 @@ export default function Reports() {
                 </MenuItem>
 
             </Menu>
-
+            <h1>Reports</h1>
             <ReportsTable setSelectedReports={setSelectedReports} />
         </div>
     );
