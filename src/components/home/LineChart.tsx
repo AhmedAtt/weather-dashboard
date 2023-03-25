@@ -1,10 +1,14 @@
 import React, {useMemo} from "react";
-import {Chart} from "react-charts";
+import {AxisOptions, Chart} from "react-charts";
 import ResizableBox from "./ResizableBox";
+import {WeatherData, FormattedChartData, AxesData, ChartData} from "../../types/Chart";
 
+type LineChartProps = {
+    weatherData: WeatherData;
+}
 
-const formatData = (data) => {
-    const formattedData = {
+const formatData = (data: WeatherData) => {
+    const formattedData: FormattedChartData = {
         time: [],
         temperature: [],
         humidity: [],
@@ -25,13 +29,13 @@ const formatData = (data) => {
     return formattedData;
 }
 
-export default function LineChart({chartData}) {
+export default function LineChart({weatherData}: LineChartProps) {
 
-    const formattedData = useMemo(() => formatData(chartData), [chartData]);
-    let temperatureData = null;
-    let humidityData = null;
+    const formattedData = useMemo(() => formatData(weatherData), [weatherData]);
+    let temperatureData:ChartData[] = [];
+    let humidityData:ChartData[] = [];
 
-    const axesData = [];
+    const axesData:AxesData[] = [];
 
     if (formattedData.temperature.length) {
         temperatureData = formattedData.time.map((time, index) => {
@@ -64,15 +68,15 @@ export default function LineChart({chartData}) {
 
 
     const primaryAxis = React.useMemo(
-        () => ({
-            getValue: datum => new Date(datum.primary),
+        ():AxisOptions<ChartData> => ({
+                getValue: datum => new Date(datum.primary),
         }),
         []
     );
 
 
     const secondaryAxes = React.useMemo(
-        () => [
+        ():AxisOptions<ChartData>[]  => [
             {
                 getValue: (datum) => datum.secondary,
                 elementType: "line",

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {styled, useTheme} from '@mui/material/styles';
+import {styled, Theme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,10 +13,13 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {Outlet} from "react-router-dom";
 import DrawerItem from "./SideBarItem";
 import {Home, WbSunny} from "@mui/icons-material";
+import {CSSObject} from "@mui/material";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import NotificationAlert from "./components/commons/NotificationAlert";
 
 const drawerWidth = 240;
 
-const openedMixin = (theme) => ({
+const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
@@ -26,7 +28,7 @@ const openedMixin = (theme) => ({
     overflowX: 'hidden',
 });
 
-const closedMixin = (theme) => ({
+const closedMixin = (theme: Theme): CSSObject => ({
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -38,7 +40,7 @@ const closedMixin = (theme) => ({
     },
 });
 
-const DrawerHeader = styled('div')(({theme}) => ({
+const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -47,9 +49,13 @@ const DrawerHeader = styled('div')(({theme}) => ({
     ...theme.mixins.toolbar,
 }));
 
+interface AppBarProps extends MuiAppBarProps {
+    open?: boolean;
+}
+
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})(({theme, open}) => ({
+})<AppBarProps>(({ theme, open }) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
@@ -142,6 +148,7 @@ export default function App() {
 
             </Drawer>
             <Box component="main" sx={{flexGrow: 1, p: 3}}>
+                <NotificationAlert/>
                 <DrawerHeader/>
                 <Outlet/>
             </Box>

@@ -11,9 +11,9 @@ import ListItemText from "@mui/material/ListItemText";
 
 export default function Reports() {
 
-    const [selectedReports, setSelectedReports] = React.useState([]);
-    const [contextMenu, setContextMenu] = React.useState(null);
-    const handleContextMenu = (event) => {
+    const [selectedReports, setSelectedReports] = React.useState<string[]>([]);
+    const [contextMenu, setContextMenu] = React.useState<{mouseX:number, mouseY:number} | null>(null);
+    const handleContextMenu = (event:React.MouseEvent) => {
         event.preventDefault();
         setContextMenu(
             contextMenu === null

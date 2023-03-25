@@ -12,8 +12,34 @@ import * as React from "react";
 import {format} from "date-fns";
 import {TableHeader} from "./TableHeader";
 import {useNavigate} from "react-router-dom";
+import {ReportTableRow} from "../../types/Report";
+import NotificationContext from "../../contexts/NotificationContext";
 
-function createData(name, city, temp, humidity, latitude, longitude, startDate, endDate, createdAt) {
+type ReportsTableProps = {
+    setSelectedReports: (reports: string[]) => void,
+}
+
+function createData({
+                        reportId,
+                        cityName,
+                        temp,
+                        humidity,
+                        latitude,
+                        longitude,
+                        startDate,
+                        endDate,
+                        createdAt
+                    }: {
+    reportId: string,
+    cityName: string,
+    temp: boolean,
+    humidity: boolean,
+    latitude: number,
+    longitude: number,
+    startDate: string,
+    endDate: string,
+    createdAt: string
+}):ReportTableRow {
 
     const parsedStartDate = new Date(startDate);
     const parsedEndDate = new Date(endDate);
@@ -21,7 +47,7 @@ function createData(name, city, temp, humidity, latitude, longitude, startDate, 
 
     const dateRange = `${format(parsedStartDate, 'dd/MM/yyyy')} - ${format(parsedEndDate, 'dd/MM/yyyy')}`;
     const dateCreated = format(parsedCreatedAt, 'dd/MM/yyyy');
-    const latAndLong = `${latitude.toFixed(2)} , ${longitude.toFixed(2)}`;
+    const latAndLong = `${latitude} , ${longitude}`;
     let includedData = "";
 
     if (temp && humidity) {
@@ -33,8 +59,8 @@ function createData(name, city, temp, humidity, latitude, longitude, startDate, 
     }
 
     return {
-        name,
-        city,
+        id: reportId,
+        name:cityName,
         includedData,
         latAndLong,
         dateRange,
@@ -43,50 +69,73 @@ function createData(name, city, temp, humidity, latitude, longitude, startDate, 
 }
 
 
-export default function ReportsTable({setSelectedReports}) {
-    const [selected, setSelected] = React.useState([]);
-    const [rows, setRows] = React.useState([]);
+export default function ReportsTable({setSelectedReports}: ReportsTableProps) {
+    const notificationContext = React.useContext(NotificationContext);
+
+    const [selected, setSelected] = React.useState<string[]>([]);
+    const [rows, setRows] = React.useState<ReportTableRow[]>([]);
 
     const navigate = useNavigate();
 
     React.useEffect(() => {
         // get reports from local storage with key starting with "Report-"
         const reportsKeys = Object.keys(localStorage).filter(key => key.startsWith("Report-"));
-        const rows = reportsKeys.map(key => {
-            const {
-                temperature,
-                humidity,
-                latitude,
-                longitude,
-                startDate,
-                endDate,
-                createdAt
-            } = JSON.parse(localStorage.getItem(key));
-            return createData(key, '-', temperature, humidity, latitude, longitude, startDate, endDate, createdAt);
+        const rows: ReportTableRow[] = [];
+        reportsKeys.forEach(key => {
+            const reportJson = localStorage.getItem(key);
+            if (reportJson) {
+                const report = JSON.parse(reportJson);
+                const {
+                    name,
+                    temperature,
+                    humidity,
+                    latitude,
+                    longitude,
+                    startDate,
+                    endDate,
+                    createdAt
+                } = report;
+                rows.push(
+                    createData({
+                        reportId: key,
+                        cityName: name,
+                        temp: temperature,
+                        humidity,
+                        latitude,
+                        longitude,
+                        startDate,
+                        endDate,
+                        createdAt
+                    })
+                );
+            }
+            else{
+                notificationContext.error("Failed to load report: " + key );
+            }
         });
         setRows(rows);
-    }, [Object.keys(localStorage)]);
+    }, [localStorage]);
 
-    const setSelectedCombined = (items) => {
+    const setSelectedCombined = (items:string[]) => {
         setSelectedReports(items);
         setSelected(items);
     }
 
 
     // delete single report
-    const handleDeleteSingle = (key) => {
+    const handleDeleteSingle = (key:string) => {
         console.log(key);
         localStorage.removeItem(key);
         setSelectedCombined([]);
     }
 
     // view single report by navigating to Home with report name
-    const handleViewSingle = (key) => {
+    const handleViewSingle = (key:string) => {
         navigate(`/home/${key}`);
     }
 
 
-    const handleSelectAllClick = (event) => {
+    const handleSelectAllClick = (event:  React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = rows.map((n) => n.name);
             setSelectedCombined(newSelected);
@@ -94,12 +143,12 @@ export default function ReportsTable({setSelectedReports}) {
         }
         setSelectedCombined([]);
     };
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
-        let newSelected = [];
+    const handleClick = (event:React.MouseEvent, reportId:string) => {
+        const selectedIndex = selected.indexOf(reportId);
+        let newSelected:string[] = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, reportId);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -113,7 +162,7 @@ export default function ReportsTable({setSelectedReports}) {
 
         setSelectedCombined(newSelected);
     };
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (reportId:string) => selected.indexOf(reportId) !== -1;
 
 
     return <Box sx={{width: '100%'}}>
@@ -137,11 +186,11 @@ export default function ReportsTable({setSelectedReports}) {
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
-                                    key={row.name}
+                                    key={row.id}
                                     selected={isItemSelected}
                                     sx={{cursor: 'pointer'}}
                                 >
-                                    <TableCell padding="checkbox" onClick={(event) => handleClick(event, row.name)}>
+                                    <TableCell padding="checkbox" onClick={(event) => handleClick(event, row.id)}>
                                         <Checkbox
                                             color="primary"
                                             checked={isItemSelected}
@@ -156,15 +205,17 @@ export default function ReportsTable({setSelectedReports}) {
                                         scope="row"
                                         padding="none"
                                     >
-                                        {row.city}
+                                        {row.name}
                                     </TableCell>
                                     <TableCell align="left">{row.includedData}</TableCell>
                                     <TableCell align="left">{row.latAndLong}</TableCell>
                                     <TableCell align="left">{row.dateRange}</TableCell>
                                     <TableCell align="left">{row.dateCreated}</TableCell>
                                     <TableCell align="left">
-                                        <TableButton icon={<VisibilityOutlined/>} title="View Report" handleClick={()=> handleViewSingle(row.name)}/>
-                                        <TableButton icon={<Delete/>} title="Delete Report" handleClick={()=>handleDeleteSingle(row.name)} />
+                                        <TableButton icon={<VisibilityOutlined/>} title="View Report"
+                                                     handleClick={() => handleViewSingle(row.id)}/>
+                                        <TableButton icon={<Delete/>} title="Delete Report"
+                                                     handleClick={() => handleDeleteSingle(row.id)}/>
                                     </TableCell>
                                 </TableRow>
                             );

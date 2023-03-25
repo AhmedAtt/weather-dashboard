@@ -1,13 +1,19 @@
+import * as React from 'react';
 import {useEffect, useState} from "react";
 import {AddBoxRounded} from "@mui/icons-material";
 import WeIconButton from "../commons/WeIconButtons";
 import FiltersGroup from "./FiltersGroup";
 import {Button, Checkbox, FormControlLabel, FormGroup} from "@mui/material";
 import {format} from "date-fns";
+import {CityFilter} from "../../types/City";
 
-export const Filters = ({onSubmitFilters, initialFilter}) => {
+type FilterProps = {
+    onSubmitFilters: (filters: Record<number, CityFilter>, temperature: boolean, humidity: boolean) => void,
+    initialFilter: CityFilter | null
+}
+export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
 
-    const [filters, setFilters] = useState([initialFilter ? initialFilter : {id: 0}]);
+    const [filters, setFilters] = useState<Record<number, CityFilter>>({});
     const [temperature, setTemperature] = useState(true);
     const [humidity, setHumidity] = useState(false);
 
@@ -15,32 +21,52 @@ export const Filters = ({onSubmitFilters, initialFilter}) => {
     useEffect(() => {
         onSubmitFilters(filters, temperature, humidity);
     }, [filters, temperature, humidity]);
+
+    useEffect(() => {
+        setFilters([initialFilter ? initialFilter : {
+            id: 0,
+            name: '',
+            latitude: 0,
+            longitude: 0,
+            startDate: null,
+            endDate: null
+        }]);
+    }, [initialFilter]);
+
     const handleAddCity = () => {
-        setFilters([...filters, {id: filters.length}]);
+        const filtersCount = Object.keys(filters).length;
+        setFilters({
+            ...filters,
+            [filtersCount]: {id: filtersCount, name: '', latitude: 0, longitude: 0, startDate: null, endDate: null}
+        });
     }
 
-    const handleRemoveCity = (id) => {
-        setFilters(filters.filter(city => city.id !== id));
+
+    const handleRemoveCity = (id: number) => {
+        const newFilters = {...filters};
+        delete newFilters[id];
+        setFilters(newFilters);
     }
 
-    const handleGroupFilterChanged = (id, filter) => {
-        const newFilters = [...filters];
+    const handleGroupFilterChanged = (id: number, filter: CityFilter) => {
+        const newFilters = {...filters};
         newFilters[id] = filter;
         setFilters(newFilters);
     }
 
-    const handleTemperatureChange = (event) => {
+    const handleTemperatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTemperature(event.target.checked);
     }
 
-    const handleHumidityChange = (event) => {
+    const handleHumidityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setHumidity(event.target.checked);
     }
 
     const handleSaveReport = () => {
-        const reports = filters.map(filter => {
-            const {latitude, longitude, startDate, endDate} = filter;
+        const reports = Object.keys(filters).map((key) => {
+            const {latitude, longitude, startDate, endDate, name}: CityFilter = filters[parseInt(key)];
             return {
+                name,
                 latitude,
                 longitude,
                 startDate: startDate,
@@ -54,7 +80,6 @@ export const Filters = ({onSubmitFilters, initialFilter}) => {
         const reportKeys = Object.keys(localStorage).filter(key => key.startsWith("Report-"));
         const numbers = reportKeys.map(key => parseInt(key.split("-")[1]));
         const lastReportNumber = reportKeys.length > 0 ? Math.max(...numbers) : 0;
-        console.log(lastReportNumber);
         //save report to local storage
         reports.map((report, index) => localStorage.setItem(`Report-${lastReportNumber + index + 1}`, JSON.stringify(report)))
     }
@@ -63,10 +88,10 @@ export const Filters = ({onSubmitFilters, initialFilter}) => {
     return <div className="filters">
         <h1>Select Coordinates or City</h1>
         {Object.keys(filters).map((id, index) =>
-            <FiltersGroup cityId={id}
+            <FiltersGroup cityId={parseInt(id)}
                           onGroupFilterChanged={handleGroupFilterChanged}
                           onRemoveCity={handleRemoveCity}
-                          initialFilter={index === 0 && initialFilter}
+                          initialFilter={index === 0 ? initialFilter : null}
             />)
         }
         <div className="add-group">

@@ -5,6 +5,12 @@ import * as React from "react";
 import {styled} from "@mui/material/styles";
 import {TableHead} from "@mui/material";
 
+type TableHeaderProps = {
+    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    numSelected: number;
+    rowCount: number;
+}
+
 const CustomTableCell = styled(TableCell)(({theme}) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: '#1976d2',
@@ -22,7 +28,7 @@ const columns = [
 ];
 
 
-export function TableHeader({onSelectAllClick, numSelected, rowCount}) {
+export function TableHeader({onSelectAllClick, numSelected, rowCount}: TableHeaderProps) {
 
     return (
         <TableHead>

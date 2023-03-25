@@ -5,7 +5,7 @@ import ListItemText from "@mui/material/ListItemText";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
 
-export default function DrawerItem({name, icon, active, route, drawerOpen}) {
+export default function DrawerItem({name, icon, route, drawerOpen}) {
 
     const navigate = useNavigate();
 

@@ -1,15 +1,23 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-
 import {debounce} from 'lodash';
 import {getCities} from "../../data-calls/weather";
+import NotificationContext from "../../contexts/NotificationContext";
+import {useContext} from "react";
+import {CityResponse, getCitiesResponse} from "../../data-calls/types";
+import {City} from "../../types/City";
 
+type FiltersCityPickerProps = {
+    onSelectCity: (city: City) => void;
+}
 
-export default function FiltersCityPicker({onSelectCity}) {
+export default function FiltersCityPicker({onSelectCity}: FiltersCityPickerProps) {
+    const notificationContext = useContext(NotificationContext);
+
     const [value, setValue] = React.useState(null);
     const [inputValue, setInputValue] = React.useState('');
-    const [options, setOptions] = React.useState([]);
+    const [options, setOptions] = React.useState<CityResponse[]>([]);
 
 
     React.useEffect(() => {
@@ -22,9 +30,9 @@ export default function FiltersCityPicker({onSelectCity}) {
 
             const fetch = async () => {
                 try {
-                    const {results} = await getCities({name: inputValue});
+                    const {results}:getCitiesResponse = await getCities({name: inputValue});
                     if (active) {
-                        let newOptions = [];
+                        let newOptions : CityResponse[] = [];
 
                         if (value) {
                             newOptions = [value];
@@ -39,7 +47,7 @@ export default function FiltersCityPicker({onSelectCity}) {
 
 
                 } catch (error) {
-                    alert(error);
+                    notificationContext.error("Failed to fetch cities");
                 }
             }
 
@@ -51,12 +59,14 @@ export default function FiltersCityPicker({onSelectCity}) {
         [value, inputValue]);
 
 
+    // @ts-ignore
     const handleChange = (event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
         onSelectCity(newValue);
     }
 
+    // @ts-ignore
     const handleInputChange = (event, newInputValue) => {
         setInputValue(newInputValue);
     }
@@ -64,10 +74,12 @@ export default function FiltersCityPicker({onSelectCity}) {
     const debouncedChangeHandler = React.useCallback(debounce(handleInputChange, 500), []);
 
 
+    // @ts-ignore
     const renderInput = (params) => (
         <TextField {...params} label="Add a location" fullWidth/>
     );
 
+    // @ts-ignore
     const renderOption = (props, option) => {
         const {name, country} = option;
 
