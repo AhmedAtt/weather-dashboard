@@ -26,7 +26,6 @@ export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity
     });
     //date range must not exceed 7 days
     useEffect(() => {
-
         if (filter.startDate && !filter.endDate) {
             const endDate = new Date(Date.parse(filter.startDate) + 7 * 24 * 60 * 60 * 1000);
             const endDateString = format(endDate, 'yyyy-MM-dd');
@@ -36,7 +35,7 @@ export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity
             const startDate = new Date(Date.parse(filter.endDate) - 7 * 24 * 60 * 60 * 1000);
             const startDateString = format(startDate, 'yyyy-MM-dd');
             setFilter({...filter, startDate: startDateString});
-            onFilterChanged('startDate', startDate);
+            onFilterChanged('startDate', startDateString);
             notificationContext.info("Start date was set to 7 days before end date");
         } else if (filter.startDate && filter.endDate) {
             const diff = Date.parse(filter.endDate) - Date.parse(filter.startDate);
@@ -53,20 +52,30 @@ export default function FiltersGroup({cityId, onGroupFilterChanged, onRemoveCity
         }
     }, [filter.startDate, filter.endDate]);
 
-    const onFilterChanged = (key: string, value: Date | string) => {
-        setFilter({...filter, [key]: value});
-        const dateSet = (filter.startDate && filter.endDate) || (!filter.startDate && !filter.endDate);
-        if (dateSet) {
-            onGroupFilterChanged(cityId, {...filter, [key]: value});
+    useEffect(() => {
+        const bothDates = filter.startDate && filter.endDate;
+        const neitherDates = !filter.startDate && !filter.endDate;
+
+        const validFilter = filter.latitude && filter.longitude && (bothDates || neitherDates);
+        if (validFilter) {
+            onGroupFilterChanged(cityId, filter);
         }
+    }, [filter]);
+    const onFilterChanged = (key: string, value: string) => {
+        setFilter({...filter, [key]: value});
     }
+
 
     const handleSelectCity = (city: City) => {
         if (city) {
             setFilter({...filter, latitude: city.latitude, longitude: city.longitude});
-            onGroupFilterChanged(cityId, {...filter, name:city.name, latitude: city.latitude, longitude: city.longitude});
+            onGroupFilterChanged(cityId, {
+                ...filter,
+                name: city.name,
+                latitude: city.latitude,
+                longitude: city.longitude
+            });
         }
-
     }
 
 

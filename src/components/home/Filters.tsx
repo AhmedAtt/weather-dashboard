@@ -64,9 +64,9 @@ export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
 
     const handleSaveReport = () => {
         const reports = [];
-        for(let i = 0; i < Object.keys(filters).length; i++) {
+        for (let i = 0; i < Object.keys(filters).length; i++) {
             const {latitude, longitude, startDate, endDate, name} = filters[i];
-            if(latitude && longitude){
+            if (latitude && longitude) {
                 reports.push({
                     name,
                     latitude,
@@ -91,10 +91,12 @@ export const Filters = ({onSubmitFilters, initialFilter}: FilterProps) => {
     return <div className="filters">
         <h1>Select Coordinates or City</h1>
         {Object.keys(filters).map((id, index) =>
-            <FiltersGroup cityId={parseInt(id)}
-                          onGroupFilterChanged={handleGroupFilterChanged}
-                          onRemoveCity={handleRemoveCity}
-                          initialFilter={index === 0 ? initialFilter : null}
+            <FiltersGroup
+                key={`filter-group-${id}`}
+                cityId={parseInt(id)}
+                onGroupFilterChanged={handleGroupFilterChanged}
+                onRemoveCity={handleRemoveCity}
+                initialFilter={index === 0 ? initialFilter : null}
             />)
         }
         <div className="add-group">

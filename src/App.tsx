@@ -14,7 +14,7 @@ import {Outlet} from "react-router-dom";
 import DrawerItem from "./SideBarItem";
 import {Home, WbSunny} from "@mui/icons-material";
 import {CSSObject} from "@mui/material";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import NotificationAlert from "./components/commons/NotificationAlert";
 
 const drawerWidth = 240;
@@ -40,7 +40,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+const DrawerHeader = styled('div')(({theme}) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -55,7 +55,7 @@ interface AppBarProps extends MuiAppBarProps {
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
+})<AppBarProps>(({theme, open}) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
@@ -90,9 +90,9 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 
 const pages = [
-    {name: "Home", route: "/home", icon:<Home/>},
+    {name: "Home", route: "/home", icon: <Home/>},
     // {name: "Cities", route: "/cities", icon:<Public/>},
-    {name: "Reports", route: "/reports",icon:<WbSunny/>}
+    {name: "Reports", route: "/reports", icon: <WbSunny/>}
 ]
 export default function App() {
     const [open, setOpen] = React.useState(false);
@@ -135,12 +135,13 @@ export default function App() {
                 </DrawerHeader>
                 <Divider/>
                 <List>
-                    {pages.map((page) => (
+                    {pages.map((page, index) => (
                         <DrawerItem
-                        name={page.name}
-                        icon={page.icon}
-                        route={page.route}
-                        drawerOpen={open}
+                            key={`drawer-item-${index}`}
+                            name={page.name}
+                            icon={page.icon}
+                            route={page.route}
+                            drawerOpen={open}
                         />
                     ))}
                 </List>
